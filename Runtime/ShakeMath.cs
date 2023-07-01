@@ -29,5 +29,11 @@ namespace Pospec.ScreenShake
                 radius * Mathf.Sin(inclination) * Mathf.Sin(azimuth),
                 radius * Mathf.Cos(inclination));
         }
+
+        public static Quaternion RotationOnSphere(float inclination, float azimuth, float up)
+        {
+            Vector3 point = PointOnSphere(inclination, azimuth, 1);
+            return Quaternion.FromToRotation(Vector3.forward, point) * Quaternion.AngleAxis(up, Vector3.forward);
+        }
     }
 } 

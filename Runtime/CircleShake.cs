@@ -4,22 +4,12 @@ using UnityEngine;
 
 namespace Pospec.ScreenShake
 {
-    [CreateAssetMenu(fileName = "Shake", menuName = "Shake/Nondirectional")]
+    [CreateAssetMenu(fileName = "CircleShake", menuName = "Shake/Circle")]
     public class CircleShake : Shake
     {
         public float amplitude = 0.1f;
         public float frequency = 5;
-        public float duration = 0.2f;
         public float rotation = 10;
-        public AnimationCurve curve;
-
-        private void Reset()
-        {
-            curve = new AnimationCurve();
-            curve.AddKey(new Keyframe(0, 0));
-            curve.AddKey(new Keyframe(0.1f, 1));
-            curve.AddKey(new Keyframe(1, 0));
-        }
 
         public override IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy)
         {
@@ -41,6 +31,7 @@ namespace Pospec.ScreenShake
                 if ((t - lastChange) * frequency > 1)
                 {
                     lastOffsetPoint = nextOffsetPoint;
+                    lastRotation = currentRotaion;
                     angle = UnityEngine.Random.Range(angle - 180 - 90, angle - 180 + 90);
                     rotationAngle = UnityEngine.Random.Range(-rotation, rotation) * curve.Evaluate(t / duration);
                     lastChange = t;
@@ -64,9 +55,12 @@ namespace Pospec.ScreenShake
                 yield break;
             float t = 0;
             float angle = UnityEngine.Random.Range(0, 360);
+            float rotationAngle = UnityEngine.Random.Range(-rotation, rotation);
             float lastChange = 0;
-            Vector2 lastOffsetPoint = Vector3.zero;
-            Vector2 currentOffset = Vector3.zero;
+            Vector2 lastOffsetPoint = Vector2.zero;
+            float lastRotation = 0;
+            Vector2 currentOffset = Vector2.zero;
+            float currentRotaion = 0;
             while (t < duration)
             {
                 t += Time.deltaTime;
@@ -75,17 +69,22 @@ namespace Pospec.ScreenShake
                 if ((t - lastChange) * frequency > 1)
                 {
                     lastOffsetPoint = nextOffsetPoint;
+                    lastRotation = currentRotaion;
                     angle = UnityEngine.Random.Range(angle - 180 - 90, angle - 180 + 90);
+                    rotationAngle = UnityEngine.Random.Range(-rotation, rotation) * curve.Evaluate(t / duration);
                     lastChange = t;
                 }
 
                 Vector2 deltaOffset = -currentOffset;
+                float deltaRotation = -currentRotaion;
                 currentOffset = Vector2.Lerp(lastOffsetPoint, nextOffsetPoint, (t - lastChange) * frequency);
+                currentRotaion = Mathf.SmoothStep(lastRotation, rotationAngle, (t - lastChange) * frequency);
                 deltaOffset += currentOffset;
-                changeRotationBy?.Invoke(deltaOffset);
+                deltaRotation += currentRotaion;
+                changeRotationBy?.Invoke(new Vector3(deltaOffset.x, deltaOffset.y, deltaRotation));
                 yield return null;
             }
-            changeRotationBy?.Invoke(-currentOffset);
+            changeRotationBy?.Invoke(new Vector3(-currentOffset.x, -currentOffset.y, -currentRotaion));
         }
     }
 }
