@@ -2,5 +2,9 @@
   "name": "pospec.screen-shake",
   "version": "1.0.0",
   "displayName": "Screen Shake",
-  "description": "Sceen Shake package."
+  "description": "Sceen Shake package.",
+  "type": "module",
+  "dependencies": {
+    "com.unity.cinemachine": ""
+  }
 }
