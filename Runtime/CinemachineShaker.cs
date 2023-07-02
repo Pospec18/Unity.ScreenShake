@@ -23,5 +23,10 @@ namespace Pospec.ScreenShake
         {
             throw new System.NotImplementedException();
         }
+
+        protected override Vector3 CameraPosition()
+        {
+            return cameraOffset.VirtualCamera.transform.position;
+        }
     }
 }

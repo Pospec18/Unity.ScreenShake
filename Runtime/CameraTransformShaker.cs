@@ -23,5 +23,10 @@ namespace Pospec.ScreenShake
             cameraTransform.transform.position += (Vector3)deltaOffset;
             cameraTransform.localEulerAngles += new Vector3(0, 0, deltaRotation);
         }
+
+        protected override Vector3 CameraPosition()
+        {
+            return cameraTransform.position;
+        }
     }
 }

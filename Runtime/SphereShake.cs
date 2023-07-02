@@ -1,98 +1,100 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Pospec.ScreenShake
 {
     [CreateAssetMenu(fileName = "SphereShake", menuName = "Shake/Sphere")]
     public class SphereShake : Shake
     {
-        public float coneAngle = 45;
+        [Tooltip("Maximum angle of cone from camera's center forward, where camera can rotate"), Range(0, 180)]
+        public float coneAngle = 5;
+
+        [Tooltip("Number of changes of shake direction in second"), Min(0)]
         public float frequency = 5;
+
+        [Tooltip("Maximum z rotation of camera"), Min(0)]
         public float maxPitch = 1;
+
+        [Tooltip("How much is shake movement spread to all directions"), Range(0, 90)]
+        public float shakeSpread = 90;
 
         public override IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy)
         {
-            if (duration <= 0)
-                yield break;
-
-            float t = 0;
-            float Scale() => curve.Evaluate(t / duration);
-
-            float azimuth = UnityEngine.Random.Range(0, 360);
-            float inclination = UnityEngine.Random.Range(0, coneAngle * Scale());
-            float lastChange = 0;
-            Quaternion prevTarget = ShakeMath.RotationOnSphere(0, 0, 0);
-            Quaternion target = ShakeMath.RotationOnSphere(inclination, azimuth, UnityEngine.Random.Range(-1, 1) * maxPitch * Scale());
-            Quaternion prevRotation = prevTarget;
-            while (t < duration)
+            foreach (Vector3 rotation in ComputeShake(UnityEngine.Random.Range(0, 360)))
             {
-                t += Time.deltaTime;
-                Quaternion currentRotation = Quaternion.Lerp(prevTarget, target, (t - lastChange) * frequency);
-                if ((t - lastChange) * frequency > 1)
-                {
-                    lastChange = t;
-                    float scale = Scale();
-                    azimuth = UnityEngine.Random.Range(azimuth - 180 - 90, azimuth - 180 + 90);
-                    inclination = UnityEngine.Random.Range(0, coneAngle * scale);
-                    prevTarget = target;
-                    target = ShakeMath.RotationOnSphere(inclination, azimuth, UnityEngine.Random.Range(-1, 1) * maxPitch * scale);
-                }
-
-                Vector3 deltaOffset = currentRotation.eulerAngles - prevTarget.eulerAngles;
-                deltaOffset.x = deltaOffset.x < 0 ? deltaOffset.x + 360 : deltaOffset.x;
-                deltaOffset.x = deltaOffset.x < 180 ? deltaOffset.x : deltaOffset.x - 360;
-                deltaOffset.y = deltaOffset.y < 0 ? deltaOffset.y + 360 : deltaOffset.y;
-                deltaOffset.y = deltaOffset.y < 180 ? deltaOffset.y : deltaOffset.y - 360;
-                changePositionAndRotationBy?.Invoke((Vector2)deltaOffset, deltaOffset.z);
-                prevTarget = currentRotation;
+                Vector3 offset = ShakeMath.NormalizeRotationAngles(rotation);
+                changePositionAndRotationBy?.Invoke(offset, offset.z);
                 yield return null;
             }
-
-            Vector3 remainingOffset = -prevTarget.eulerAngles;
-            remainingOffset.x = remainingOffset.x < 0 ? remainingOffset.x + 360 : remainingOffset.x;
-            remainingOffset.x = remainingOffset.x < 180 ? remainingOffset.x : remainingOffset.x - 360;
-            remainingOffset.y = remainingOffset.y < 0 ? remainingOffset.y + 360 : remainingOffset.y;
-            remainingOffset.y = remainingOffset.y < 180 ? remainingOffset.y : remainingOffset.y - 360;
-            changePositionAndRotationBy?.Invoke((Vector2)remainingOffset, remainingOffset.z);
         }
 
         public override IEnumerator ShakeCoroutine(Action<Vector3> changeRotationBy)
         {
+            foreach (Vector3 rotation in ComputeShake(UnityEngine.Random.Range(0, 360)))
+            {
+                changeRotationBy?.Invoke(rotation);
+                yield return null;
+            }
+        }
+
+        public override IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy, Vector3 direction)
+        {
+            float scale = direction.magnitude;
+            foreach (Vector3 rotation in ComputeShake(Vector3.Angle(Vector3.right, direction)))
+            {
+                Vector3 offset = ShakeMath.ScaleAngles(rotation, scale);
+                changePositionAndRotationBy?.Invoke(offset, offset.z);
+                yield return null;
+            }
+        }
+
+        public override IEnumerator ShakeCoroutine(Action<Vector3> changeRotationBy, Vector3 direction)
+        {
+            float scale = direction.magnitude;
+            foreach (Vector3 rotation in ComputeShake(Vector3.Angle(Vector3.right, direction)))
+            {
+                changeRotationBy?.Invoke(ShakeMath.ScaleAngles(rotation, scale));
+                yield return null;
+            }
+        }
+
+        private IEnumerable<Vector3> ComputeShake(float angle)
+        {
             if (duration <= 0)
                 yield break;
 
             float t = 0;
             float Scale() => curve.Evaluate(t / duration);
 
-            float azimuth = UnityEngine.Random.Range(0, 360);
+            float azimuth = angle;
             float inclination = UnityEngine.Random.Range(0, coneAngle * Scale());
             float lastChange = 0;
             Quaternion prevTarget = ShakeMath.RotationOnSphere(0, 0, 0);
             Quaternion target = ShakeMath.RotationOnSphere(inclination, azimuth, UnityEngine.Random.Range(-1f, 1f) * maxPitch * Scale());
-            Quaternion prevRotation = prevTarget;
             while (t < duration)
             {
                 t += Time.deltaTime;
-                Quaternion currentRotation = Quaternion.Lerp(prevTarget, target, (t - lastChange) * frequency);
+                Quaternion currentRotation = Quaternion.Lerp(prevTarget, target, Mathf.SmoothStep(0, 1, (t - lastChange) * frequency));
                 if ((t - lastChange) * frequency > 1)
                 {
                     lastChange = t;
                     float scale = Scale();
-                    azimuth = UnityEngine.Random.Range(azimuth - 180 - 90, azimuth - 180 + 90);
+                    azimuth = UnityEngine.Random.Range(azimuth - 180 - shakeSpread, azimuth - 180 + shakeSpread);
                     inclination = UnityEngine.Random.Range(0, coneAngle * scale);
                     prevTarget = target;
                     target = ShakeMath.RotationOnSphere(inclination, azimuth, UnityEngine.Random.Range(-1f, 1f) * maxPitch * scale);
                 }
 
                 Vector3 deltaOffset = currentRotation.eulerAngles - prevTarget.eulerAngles;
-                changeRotationBy?.Invoke(deltaOffset);
                 prevTarget = currentRotation;
-                yield return null;
+                yield return deltaOffset;
             }
 
-            Vector3 remainingOffset = -prevTarget.eulerAngles;
-            changeRotationBy?.Invoke(remainingOffset);
+            Vector3 offset = -prevTarget.eulerAngles;
+            yield return offset;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Pospec.ScreenShake
@@ -7,55 +8,62 @@ namespace Pospec.ScreenShake
     [CreateAssetMenu(fileName = "CircleShake", menuName = "Shake/Circle")]
     public class CircleShake : Shake
     {
+        [Tooltip("Maximum size of shake"), Min(0)]
         public float amplitude = 0.1f;
+
+        [Tooltip("Number of changes of shake direction in second"), Min(0)]
         public float frequency = 5;
-        public float rotation = 10;
+
+        [Tooltip("Maximum z rotation of camera"), Min(0)]
+        public float maxPitch = 1;
+
+        [Tooltip("How much is shake movement spread to all directions"), Range(0, 90)]
+        public float shakeSpread = 90;
 
         public override IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy)
         {
-            if (duration <= 0)
-                yield break;
-            float t = 0;
-            float angle = UnityEngine.Random.Range(0, 360);
-            float rotationAngle = UnityEngine.Random.Range(-rotation, rotation);
-            float lastChange = 0;
-            Vector2 lastOffsetPoint = Vector2.zero;
-            float lastRotation = 0;
-            Vector2 currentOffset = Vector2.zero;
-            float currentRotaion = 0;
-            while (t < duration)
+            foreach (Vector3 rotation in ComputeShake(UnityEngine.Random.Range(0, 360)))
             {
-                t += Time.deltaTime;
-
-                Vector2 nextOffsetPoint = ShakeMath.PointOnCircle(angle, amplitude * curve.Evaluate(t / duration));
-                if ((t - lastChange) * frequency > 1)
-                {
-                    lastOffsetPoint = nextOffsetPoint;
-                    lastRotation = currentRotaion;
-                    angle = UnityEngine.Random.Range(angle - 180 - 90, angle - 180 + 90);
-                    rotationAngle = UnityEngine.Random.Range(-rotation, rotation) * curve.Evaluate(t / duration);
-                    lastChange = t;
-                }
-
-                Vector2 deltaOffset = -currentOffset;
-                float deltaRotation = -currentRotaion;
-                currentOffset = Vector2.Lerp(lastOffsetPoint, nextOffsetPoint, (t - lastChange) * frequency);
-                currentRotaion = Mathf.SmoothStep(lastRotation, rotationAngle, (t - lastChange) * frequency);
-                deltaOffset += currentOffset;
-                deltaRotation += currentRotaion;
-                changePositionAndRotationBy?.Invoke(deltaOffset, deltaRotation);
+                changePositionAndRotationBy?.Invoke(rotation, rotation.z);
                 yield return null;
             }
-            changePositionAndRotationBy?.Invoke(-currentOffset, -currentRotaion);
         }
 
         public override IEnumerator ShakeCoroutine(Action<Vector3> changeRotationBy)
         {
+            foreach (Vector3 rotation in ComputeShake(UnityEngine.Random.Range(0, 360)))
+            {
+                changeRotationBy?.Invoke(rotation);
+                yield return null;
+            }
+        }
+
+        public override IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy, Vector3 direction)
+        {
+            float scale = direction.magnitude;
+            foreach (Vector3 rotation in ComputeShake(Vector3.Angle(Vector3.right, direction)))
+            {
+                changePositionAndRotationBy?.Invoke(rotation * scale, ShakeMath.NormalizeRotationAngle(rotation.z) * scale);
+                yield return null;
+            }
+        }
+
+        public override IEnumerator ShakeCoroutine(Action<Vector3> changeRotationBy, Vector3 direction)
+        {
+            float scale = direction.magnitude;
+            foreach (Vector3 rotation in ComputeShake(Vector3.Angle(Vector3.right, direction)))
+            {
+                changeRotationBy?.Invoke(ShakeMath.ScaleAngles(rotation, scale));
+                yield return null;
+            }
+        }
+
+        private IEnumerable<Vector3> ComputeShake(float angle)
+        {
             if (duration <= 0)
                 yield break;
             float t = 0;
-            float angle = UnityEngine.Random.Range(0, 360);
-            float rotationAngle = UnityEngine.Random.Range(-rotation, rotation);
+            float rotationAngle = UnityEngine.Random.Range(-maxPitch, maxPitch);
             float lastChange = 0;
             Vector2 lastOffsetPoint = Vector2.zero;
             float lastRotation = 0;
@@ -70,21 +78,20 @@ namespace Pospec.ScreenShake
                 {
                     lastOffsetPoint = nextOffsetPoint;
                     lastRotation = currentRotaion;
-                    angle = UnityEngine.Random.Range(angle - 180 - 90, angle - 180 + 90);
-                    rotationAngle = UnityEngine.Random.Range(-rotation, rotation) * curve.Evaluate(t / duration);
+                    angle = UnityEngine.Random.Range(angle - 180 - shakeSpread, angle - 180 + shakeSpread);
+                    rotationAngle = UnityEngine.Random.Range(-maxPitch, maxPitch) * curve.Evaluate(t / duration);
                     lastChange = t;
                 }
 
                 Vector2 deltaOffset = -currentOffset;
                 float deltaRotation = -currentRotaion;
-                currentOffset = Vector2.Lerp(lastOffsetPoint, nextOffsetPoint, (t - lastChange) * frequency);
+                currentOffset = Vector2.Lerp(lastOffsetPoint, nextOffsetPoint, Mathf.SmoothStep(0, 1, (t - lastChange) * frequency));
                 currentRotaion = Mathf.SmoothStep(lastRotation, rotationAngle, (t - lastChange) * frequency);
                 deltaOffset += currentOffset;
                 deltaRotation += currentRotaion;
-                changeRotationBy?.Invoke(new Vector3(deltaOffset.x, deltaOffset.y, deltaRotation));
-                yield return null;
+                yield return new Vector3(deltaOffset.x, deltaOffset.y, deltaRotation);
             }
-            changeRotationBy?.Invoke(new Vector3(-currentOffset.x, -currentOffset.y, -currentRotaion));
+            yield return new Vector3(-currentOffset.x, -currentOffset.y, -currentRotaion);
         }
     }
 }
