@@ -12,7 +12,8 @@ namespace Pospec.ScreenShake
 
         private void Reset()
         {
-            cameraOffset = GetComponent<CinemachineCameraOffset>();
+            cameraOffset = GetComponentInChildren<CinemachineCameraOffset>();
+            cameraRotation = GetComponentInChildren<CinemachineCameraRotation>();
         }
 
         protected override void ChangeOffsetBy(Vector2 deltaOffset, float deltaRotation)
