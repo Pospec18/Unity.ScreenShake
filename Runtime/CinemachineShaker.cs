@@ -8,6 +8,7 @@ namespace Pospec.ScreenShake
     public class CinemachineShaker : CameraShaker
     {
         [SerializeField] private CinemachineCameraOffset cameraOffset;
+        [SerializeField] private CinemachineCameraRotation cameraRotation;
 
         private void Reset()
         {
@@ -17,11 +18,13 @@ namespace Pospec.ScreenShake
         protected override void ChangeOffsetBy(Vector2 deltaOffset, float deltaRotation)
         {
             cameraOffset.m_Offset += (Vector3)deltaOffset;
+            cameraRotation.m_Offset += new Vector3(0, 0, deltaRotation);
         }
 
         protected override void ChangeOffsetBy(Vector3 deltaRotation)
         {
-            throw new System.NotImplementedException();
+            Debug.Log("AAaa");
+            cameraRotation.m_Offset += deltaRotation;
         }
 
         protected override Vector3 CameraPosition()
