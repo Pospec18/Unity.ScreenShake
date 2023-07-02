@@ -25,7 +25,7 @@ namespace Pospec.ScreenShake
         {
             foreach (Vector3 rotation in ComputeShake(UnityEngine.Random.Range(0, 360)))
             {
-                Vector3 offset = ShakeMath.NormalizeRotationAngles(rotation);
+                Vector3 offset = ShakeMath.ClampRotationAngles(rotation);
                 changePositionAndRotationBy?.Invoke(offset, offset.z);
                 yield return null;
             }
@@ -40,21 +40,21 @@ namespace Pospec.ScreenShake
             }
         }
 
-        public override IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy, Vector3 direction)
+        public override IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy, Vector2 direction)
         {
             float scale = direction.magnitude;
-            foreach (Vector3 rotation in ComputeShake(Vector3.Angle(Vector3.right, direction)))
+            foreach (Vector3 rotation in ComputeShake(Vector2.SignedAngle(Vector2.right, direction)))
             {
-                Vector3 offset = ShakeMath.ScaleAngles(rotation, scale);
+                Vector3 offset = ShakeMath.ScaleAngles(rotation.ToOffset(), scale);
                 changePositionAndRotationBy?.Invoke(offset, offset.z);
                 yield return null;
             }
         }
 
-        public override IEnumerator ShakeCoroutine(Action<Vector3> changeRotationBy, Vector3 direction)
+        public override IEnumerator ShakeCoroutine(Action<Vector3> changeRotationBy, Vector3 direction, Vector3 cameraForward)
         {
             float scale = direction.magnitude;
-            foreach (Vector3 rotation in ComputeShake(Vector3.Angle(Vector3.right, direction)))
+            foreach (Vector3 rotation in ComputeShake(Vector3.SignedAngle(Vector3.right, direction, cameraForward)))
             {
                 changeRotationBy?.Invoke(ShakeMath.ScaleAngles(rotation, scale));
                 yield return null;

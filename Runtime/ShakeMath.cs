@@ -35,24 +35,34 @@ namespace Pospec.ScreenShake
             return Quaternion.FromToRotation(Vector3.forward, point) * Quaternion.AngleAxis(up, Vector3.forward);
         }
 
-        public static float NormalizeRotationAngle(float angle)
+        public static float ClampRotationAngle(float angle)
         {
             angle = angle < 0 ? angle + 360 : angle;
             angle = angle < 180 ? angle : angle - 360;
             return angle;
         }
 
-        public static Vector3 NormalizeRotationAngles(Vector3 angles)
+        public static Vector3 ClampRotationAngles(Vector3 angles)
         {
-            angles.x = NormalizeRotationAngle(angles.x);
-            angles.y = NormalizeRotationAngle(angles.y);
-            angles.z = NormalizeRotationAngle(angles.z);
+            angles.x = ClampRotationAngle(angles.x);
+            angles.y = ClampRotationAngle(angles.y);
+            angles.z = ClampRotationAngle(angles.z);
             return angles;
         }
 
         public static Vector3 ScaleAngles(Vector3 angles, float scale)
         {
-            return NormalizeRotationAngles(angles) * scale;
+            return ClampRotationAngles(angles) * scale;
+        }
+
+        public static Vector3 ToRotation(this Vector3 offset)
+        {
+            return new Vector3(-offset.y, offset.x, offset.z);
+        }
+
+        public static Vector3 ToOffset(this Vector3 rotation)
+        {
+            return new Vector3(-rotation.y, rotation.x, rotation.z);
         }
     }
 } 

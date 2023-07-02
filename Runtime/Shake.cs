@@ -21,8 +21,8 @@ namespace Pospec.ScreenShake
         }
 
         public abstract IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy);
-        public abstract IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy, Vector3 direction);
+        public abstract IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy, Vector2 direction);
         public abstract IEnumerator ShakeCoroutine(Action<Vector3> changeRotationBy);
-        public abstract IEnumerator ShakeCoroutine(Action<Vector3> changeRotationBy, Vector3 direction);
+        public abstract IEnumerator ShakeCoroutine(Action<Vector3> changeRotationBy, Vector3 direction, Vector3 cameraForward);
     }
 }

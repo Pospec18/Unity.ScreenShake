@@ -28,5 +28,10 @@ namespace Pospec.ScreenShake
         {
             return cameraOffset.VirtualCamera.transform.position;
         }
+
+        protected override Vector3 CameraForward()
+        {
+            return cameraOffset.VirtualCamera.transform.forward;
+        }
     }
 }

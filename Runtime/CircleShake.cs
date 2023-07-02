@@ -24,7 +24,7 @@ namespace Pospec.ScreenShake
         {
             foreach (Vector3 rotation in ComputeShake(UnityEngine.Random.Range(0, 360)))
             {
-                changePositionAndRotationBy?.Invoke(rotation, rotation.z);
+                changePositionAndRotationBy?.Invoke(new Vector2(rotation.y, rotation.x), rotation.z);
                 yield return null;
             }
         }
@@ -38,22 +38,22 @@ namespace Pospec.ScreenShake
             }
         }
 
-        public override IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy, Vector3 direction)
+        public override IEnumerator ShakeCoroutine(Action<Vector2, float> changePositionAndRotationBy, Vector2 direction)
         {
             float scale = direction.magnitude;
-            foreach (Vector3 rotation in ComputeShake(Vector3.Angle(Vector3.right, direction)))
+            foreach (Vector3 offset in ComputeShake(Vector2.SignedAngle(Vector2.right, direction)))
             {
-                changePositionAndRotationBy?.Invoke(rotation * scale, ShakeMath.NormalizeRotationAngle(rotation.z) * scale);
+                changePositionAndRotationBy?.Invoke(offset * scale, ShakeMath.ClampRotationAngle(offset.z) * scale);
                 yield return null;
             }
         }
 
-        public override IEnumerator ShakeCoroutine(Action<Vector3> changeRotationBy, Vector3 direction)
+        public override IEnumerator ShakeCoroutine(Action<Vector3> changeRotationBy, Vector3 direction, Vector3 cameraForward)
         {
             float scale = direction.magnitude;
-            foreach (Vector3 rotation in ComputeShake(Vector3.Angle(Vector3.right, direction)))
+            foreach (Vector3 offset in ComputeShake(Vector3.SignedAngle(Vector3.right, direction, cameraForward)))
             {
-                changeRotationBy?.Invoke(ShakeMath.ScaleAngles(rotation, scale));
+                changeRotationBy?.Invoke(ShakeMath.ScaleAngles(offset.ToRotation(), scale));
                 yield return null;
             }
         }

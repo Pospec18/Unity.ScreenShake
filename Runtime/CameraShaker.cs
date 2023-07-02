@@ -37,7 +37,7 @@ namespace Pospec.ScreenShake
                         return;
 
                     ChangeOffsetBy(d);
-                }, direction));
+                }, direction, CameraForward()));
         }
 
         public void Shake(IShake shake)
@@ -64,5 +64,6 @@ namespace Pospec.ScreenShake
         protected abstract void ChangeOffsetBy(Vector2 deltaOffset, float deltaRotation);
 
         protected abstract Vector3 CameraPosition();
+        protected abstract Vector3 CameraForward();
     }
 }
