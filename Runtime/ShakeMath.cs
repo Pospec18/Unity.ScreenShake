@@ -3,8 +3,17 @@ using UnityEngine.UIElements;
 
 namespace Pospec.ScreenShake
 {
+    /// <summary>
+    /// Helper class for math used in shakes
+    /// </summary>
     public static class ShakeMath
     {
+        /// <summary>
+        /// Converts Polar coordinates to Cartesian (x, y) coordinates
+        /// </summary>
+        /// <param name="angle">angle between (1, 0) and position of point in degreed</param>
+        /// <param name="radius">radius of the circle</param>
+        /// <returns>Point on circle</returns>
         public static Vector2 PointOnCircle(float angle, float radius)
         {
             angle *= Mathf.PI / 180;
@@ -12,11 +21,11 @@ namespace Pospec.ScreenShake
         }
 
         /// <summary>
-        /// Converts shperical coordinates to Cartesian (x, y, z) coordinates
+        /// Converts Shperical coordinates to Cartesian (x, y, z) coordinates
         /// </summary>
-        /// <param name="inclination">vertical angles.x in degrees (for inclination = 90 PointOnCircle is calculated)</param>
-        /// <param name="azimuth">angles.x of circle in degrees</param>
-        /// <param name="radius">radius of the circle</param>
+        /// <param name="inclination">angle between forward direction and line from center of the sphere to the point</param>
+        /// <param name="azimuth">angle on circle where point lies, circle is ortogonal to forward direction</param>
+        /// <param name="radius">radius of the shpere</param>
         /// <returns>Point on sphere</returns>
         public static Vector3 PointOnSphere(float inclination, float azimuth, float radius)
         {
@@ -29,37 +38,70 @@ namespace Pospec.ScreenShake
                 radius * Mathf.Cos(inclination));
         }
 
+        /// <summary>
+        /// Calculates rotation to point in sphere from Vector3.forward
+        /// </summary>
+        /// <param name="inclination">angle between forward direction and line from center of the sphere to the point</param>
+        /// <param name="azimuth">angle on circle where point lies, circle is ortogonal to forward direction</param>
+        /// <param name="up">by what angle rotate up direction</param>
+        /// <returns></returns>
         public static Quaternion RotationOnSphere(float inclination, float azimuth, float up)
         {
             Vector3 point = PointOnSphere(inclination, azimuth, 1);
             return Quaternion.FromToRotation(Vector3.forward, point) * Quaternion.AngleAxis(up, Vector3.forward);
         }
 
-        public static float ClampRotationAngle(float angle)
+        /// <summary>
+        /// Clamps angle to range from -180 to 180
+        /// </summary>
+        /// <param name="angle"></param>
+        /// <returns>Angle between -180 and 180 degreees</returns>
+        public static float ClampToRotationAngle(this float angle)
         {
             angle = angle < 0 ? angle + 360 : angle;
             angle = angle < 180 ? angle : angle - 360;
             return angle;
         }
 
-        public static Vector3 ClampRotationAngles(Vector3 angles)
+        /// <summary>
+        /// Clamps all vector components to range from -180 to 180
+        /// </summary>
+        /// <param name="angles">vector of angles</param>
+        /// <returns>Vector of angles between -180 and 180 degreees</returns>
+        public static Vector3 ClampToEulerRotation(this Vector3 angles)
         {
-            angles.x = ClampRotationAngle(angles.x);
-            angles.y = ClampRotationAngle(angles.y);
-            angles.z = ClampRotationAngle(angles.z);
+            angles.x = ClampToRotationAngle(angles.x);
+            angles.y = ClampToRotationAngle(angles.y);
+            angles.z = ClampToRotationAngle(angles.z);
             return angles;
         }
 
-        public static Vector3 ScaleAngles(Vector3 angles, float scale)
+        /// <summary>
+        /// Scales vector of angles by scale factor
+        /// </summary>
+        /// <param name="angles">vector of angles</param>
+        /// <param name="scale">scale factor</param>
+        /// <returns></returns>
+        public static Vector3 ScaleAngles(this Vector3 angles, float scale)
         {
-            return ClampRotationAngles(angles) * scale;
+            return ClampToEulerRotation(angles) * scale;
         }
 
+        /// <summary>
+        /// Convert position offset to euler rotation
+        /// </summary>
+        /// <param name="offset">position offset</param>
+        /// <returns>euler rotation</returns>
         public static Vector3 ToRotation(this Vector3 offset)
         {
             return new Vector3(-offset.y, offset.x, offset.z);
         }
 
+        /// <summary>
+        /// Converts euler rotation to position position offset
+        /// </summary>
+        /// <param name="rotation">euler rotation</param>
+        /// <returns>position offset</returns>
         public static Vector3 ToOffset(this Vector3 rotation)
         {
             return new Vector3(-rotation.y, rotation.x, rotation.z);

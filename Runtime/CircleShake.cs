@@ -43,7 +43,7 @@ namespace Pospec.ScreenShake
             float scale = direction.magnitude;
             foreach (Vector3 offset in ComputeShake(Vector2.SignedAngle(Vector2.right, direction)))
             {
-                changePositionAndRotationBy?.Invoke(offset * scale, ShakeMath.ClampRotationAngle(offset.z) * scale);
+                changePositionAndRotationBy?.Invoke(offset * scale, offset.z.ClampToRotationAngle() * scale);
                 yield return null;
             }
         }

@@ -25,7 +25,7 @@ namespace Pospec.ScreenShake
         {
             foreach (Vector3 rotation in ComputeShake(UnityEngine.Random.Range(0, 360)))
             {
-                Vector3 offset = ShakeMath.ClampRotationAngles(rotation);
+                Vector3 offset = rotation.ClampToEulerRotation();
                 changePositionAndRotationBy?.Invoke(offset, offset.z);
                 yield return null;
             }
