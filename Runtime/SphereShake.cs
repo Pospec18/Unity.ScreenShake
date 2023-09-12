@@ -73,6 +73,7 @@ namespace Pospec.ScreenShake
             float inclination = UnityEngine.Random.Range(0, coneAngle * Scale());
             float lastChange = 0;
             Quaternion prevTarget = ShakeMath.RotationOnSphere(0, 0, 0);
+            Quaternion prevRetation = prevTarget;
             Quaternion target = ShakeMath.RotationOnSphere(inclination, azimuth, UnityEngine.Random.Range(-1f, 1f) * maxPitch * Scale());
             while (t < duration)
             {
@@ -88,8 +89,8 @@ namespace Pospec.ScreenShake
                     target = ShakeMath.RotationOnSphere(inclination, azimuth, UnityEngine.Random.Range(-1f, 1f) * maxPitch * scale);
                 }
 
-                Vector3 deltaOffset = currentRotation.eulerAngles - prevTarget.eulerAngles;
-                prevTarget = currentRotation;
+                Vector3 deltaOffset = currentRotation.eulerAngles - prevRetation.eulerAngles;
+                prevRetation = currentRotation;
                 yield return deltaOffset;
             }
 
