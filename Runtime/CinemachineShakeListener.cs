@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Pospec.ScreenShake
 {
-    public class CinemachineShaker : CameraShaker
+    public class CinemachineShakeListener : ShakeListener
     {
         [SerializeField] private CinemachineCameraOffset cameraOffset;
         [SerializeField] private CinemachineCameraRotation cameraRotation;

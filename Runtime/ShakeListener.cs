@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Pospec.ScreenShake
 {
-    public abstract class CameraShaker : MonoBehaviour, ICameraShaker
+    public abstract class ShakeListener : MonoBehaviour, IShakeListener
     {
         public bool CanShake { get; set; } = true;
 

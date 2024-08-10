@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Pospec.ScreenShake
 {
-    public interface ICameraShaker
+    public interface IShakeListener
     {
         /// <summary>
         /// Trigger shake from objects position
