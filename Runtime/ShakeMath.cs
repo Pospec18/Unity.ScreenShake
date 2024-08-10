@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Pospec.ScreenShake
 {
@@ -21,11 +20,11 @@ namespace Pospec.ScreenShake
         }
 
         /// <summary>
-        /// Converts Shperical coordinates to Cartesian (x, y, z) coordinates
+        /// Converts Spherical coordinates to Cartesian (x, y, z) coordinates
         /// </summary>
         /// <param name="inclination">angle between forward direction and line from center of the sphere to the point</param>
-        /// <param name="azimuth">angle on circle where point lies, circle is ortogonal to forward direction</param>
-        /// <param name="radius">radius of the shpere</param>
+        /// <param name="azimuth">angle on circle where point lies, circle is orthogonal to forward direction</param>
+        /// <param name="radius">radius of the sphere</param>
         /// <returns>Point on sphere</returns>
         public static Vector3 PointOnSphere(float inclination, float azimuth, float radius)
         {
@@ -55,7 +54,7 @@ namespace Pospec.ScreenShake
         /// Clamps angle to range from -180 to 180
         /// </summary>
         /// <param name="angle"></param>
-        /// <returns>Angle between -180 and 180 degreees</returns>
+        /// <returns>Angle between -180 and 180 degrees</returns>
         public static float ClampToRotationAngle(this float angle)
         {
             angle = angle < 0 ? angle + 360 : angle;
@@ -67,7 +66,7 @@ namespace Pospec.ScreenShake
         /// Clamps all vector components to range from -180 to 180
         /// </summary>
         /// <param name="angles">vector of angles</param>
-        /// <returns>Vector of angles between -180 and 180 degreees</returns>
+        /// <returns>Vector of angles between -180 and 180 degrees</returns>
         public static Vector3 ClampToEulerRotation(this Vector3 angles)
         {
             angles.x = ClampToRotationAngle(angles.x);

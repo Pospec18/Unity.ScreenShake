@@ -5,7 +5,7 @@ namespace Pospec.ScreenShake
     public interface ICameraShaker
     {
         /// <summary>
-        /// Trigger shake from objects potition
+        /// Trigger shake from objects position
         /// </summary>
         /// <param name="shake">shake to be used</param>
         /// <param name="sender">object where shake was triggered</param>

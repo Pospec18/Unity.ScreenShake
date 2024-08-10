@@ -68,7 +68,7 @@ namespace Pospec.ScreenShake
             Vector2 lastOffsetPoint = Vector2.zero;
             float lastRotation = 0;
             Vector2 currentOffset = Vector2.zero;
-            float currentRotaion = 0;
+            float currentRotation = 0;
             while (t < duration)
             {
                 t += Time.deltaTime;
@@ -77,21 +77,21 @@ namespace Pospec.ScreenShake
                 if ((t - lastChange) * frequency > 1)
                 {
                     lastOffsetPoint = nextOffsetPoint;
-                    lastRotation = currentRotaion;
+                    lastRotation = currentRotation;
                     angle = UnityEngine.Random.Range(angle - 180 - shakeSpread, angle - 180 + shakeSpread);
                     rotationAngle = UnityEngine.Random.Range(-maxPitch, maxPitch) * curve.Evaluate(t / duration);
                     lastChange = t;
                 }
 
                 Vector2 deltaOffset = -currentOffset;
-                float deltaRotation = -currentRotaion;
+                float deltaRotation = -currentRotation;
                 currentOffset = Vector2.Lerp(lastOffsetPoint, nextOffsetPoint, Mathf.SmoothStep(0, 1, (t - lastChange) * frequency));
-                currentRotaion = Mathf.SmoothStep(lastRotation, rotationAngle, (t - lastChange) * frequency);
+                currentRotation = Mathf.SmoothStep(lastRotation, rotationAngle, (t - lastChange) * frequency);
                 deltaOffset += currentOffset;
-                deltaRotation += currentRotaion;
+                deltaRotation += currentRotation;
                 yield return new Vector3(deltaOffset.x, deltaOffset.y, deltaRotation);
             }
-            yield return new Vector3(-currentOffset.x, -currentOffset.y, -currentRotaion);
+            yield return new Vector3(-currentOffset.x, -currentOffset.y, -currentRotation);
         }
     }
 }
