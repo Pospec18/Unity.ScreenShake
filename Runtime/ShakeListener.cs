@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Pospec.ScreenShake
@@ -8,6 +9,8 @@ namespace Pospec.ScreenShake
 
         [SerializeField] private bool is2D = true;
         public bool Is2D { get => is2D; set => is2D = value; }
+
+        public static IList<ShakeListener> ActiveListeners { get; protected set; } = new List<ShakeListener>();
 
         public void ShakeFrom(IShake shake, Transform sender)
         {

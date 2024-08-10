@@ -6,6 +6,16 @@ namespace Pospec.ScreenShake
     {
         [SerializeField] private Transform cameraTransform;
 
+        private void OnEnable()
+        {
+            ActiveListeners.Add(this);
+        }
+
+        private void OnDisable()
+        {
+            ActiveListeners.Remove(this);
+        }
+
         private void Reset()
         {
             cameraTransform = Camera.main.GetComponent<Transform>();

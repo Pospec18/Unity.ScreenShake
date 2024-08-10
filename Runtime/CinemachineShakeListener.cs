@@ -7,6 +7,16 @@ namespace Pospec.ScreenShake
         [SerializeField] private CinemachineCameraOffset cameraOffset;
         [SerializeField] private CinemachineCameraRotation cameraRotation;
 
+        private void OnEnable()
+        {
+            ActiveListeners.Add(this);
+        }
+
+        private void OnDisable()
+        {
+            ActiveListeners.Remove(this);
+        }
+
         private void Reset()
         {
             cameraOffset = GetComponentInChildren<CinemachineCameraOffset>();
