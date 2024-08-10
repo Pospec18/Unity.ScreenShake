@@ -19,7 +19,7 @@ namespace Pospec.ScreenShake
 
         public void ShakeFrom(IShake shake, Vector3 worldPosition)
         {
-            Vector3 direction = CameraPosition() - worldPosition;
+            Vector3 direction = transform.position - worldPosition;
             DirectionalShake(shake, direction.normalized / direction.magnitude);
         }
 
@@ -66,7 +66,6 @@ namespace Pospec.ScreenShake
         protected abstract void ChangeOffsetBy(Vector3 deltaRotation);
         protected abstract void ChangeOffsetBy(Vector2 deltaOffset, float deltaRotation);
 
-        protected abstract Vector3 CameraPosition();
         protected abstract Vector3 CameraForward();
     }
 }
