@@ -12,13 +12,18 @@ namespace Pospec.ScreenShake
         private void Awake()
         {
             if (playOnAwake)
-                StartShake();
+                Play();
         }
 
-        public void StartShake()
+        public void PlayDelayed(float seconds)
+        {
+            Invoke("Play", seconds);
+        }
+
+        public void Play()
         {
             if (loop)
-                Invoke("StartShake", shake.duration);
+                Invoke("Play", shake.duration);
 
             if (shake == null)
             {

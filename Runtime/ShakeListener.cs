@@ -5,7 +5,7 @@ namespace Pospec.ScreenShake
 {
     public abstract class ShakeListener : MonoBehaviour, IShakeListener
     {
-        public bool CanShake { get; set; } = true;
+        public bool canShake = true;
 
         [SerializeField] private bool is2D = true;
         public bool Is2D { get => is2D; set => is2D = value; }
@@ -28,7 +28,7 @@ namespace Pospec.ScreenShake
             if (Is2D)
                 StartCoroutine(shake.ShakeCoroutine((d, v) =>
                 {
-                    if (!CanShake)
+                    if (!canShake || !ShakeSettings.Data.ShakeOn)
                         return;
 
                     ChangeOffsetBy(d, v);
@@ -36,7 +36,7 @@ namespace Pospec.ScreenShake
             else
                 StartCoroutine(shake.ShakeCoroutine((d) =>
                 {
-                    if (!CanShake)
+                    if (!canShake || !ShakeSettings.Data.ShakeOn)
                         return;
 
                     ChangeOffsetBy(d);
@@ -48,7 +48,8 @@ namespace Pospec.ScreenShake
             if (Is2D)
                 StartCoroutine(shake.ShakeCoroutine((d, v) =>
                 {
-                    if (!CanShake)
+                    Debug.Log($"{ShakeSettings.Data.ShakeOn}{canShake}");
+                    if (!canShake || !ShakeSettings.Data.ShakeOn)
                         return;
 
                     ChangeOffsetBy(d, v);
@@ -56,7 +57,7 @@ namespace Pospec.ScreenShake
             else
                 StartCoroutine(shake.ShakeCoroutine((d) =>
                 {
-                    if (!CanShake)
+                    if (!canShake || !ShakeSettings.Data.ShakeOn)
                         return;
 
                     ChangeOffsetBy(d);
